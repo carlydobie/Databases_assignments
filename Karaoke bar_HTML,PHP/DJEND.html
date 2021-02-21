@@ -1,0 +1,111 @@
+<html>
+<head>
+<title> Karaoke Queues for DJ </title>
+<h1><font face="Comic sans MS" size="20" color = "#00ff00"> WELCOME, DJ LEHUTA </font></h1>
+<img
+src="https://derpicdn.net/img/2019/1/9/1930447/full.gif" alt="dancing pony" style=width:150px;height:200px;
+/>
+<img
+src="https://media1.giphy.com/media/kgsiGUxf0hKSoPl5zg/giphy.gif" alt="rainbow sonic, dancing" style=width:225px;height:200px;
+/>
+<img
+src="https://res.cloudinary.com/teepublic/image/private/s--MLZm22sc--/t_Preview/b_rgb:ffffff,c_lpad,f_jpg,h_630,q_90,w_1200/v1551526816/production/designs/4319849_0.jpg" alt="cool s" style=width:300px;height:200px;
+/>
+<img
+src="https://media2.giphy.com/media/3xJjEZ3tSpgTS/giphy.gif" alt="sonic spinning" style=width:200px;height:200px;
+/>
+<img
+src="https://thumbs.gfycat.com/OccasionalPettyBlackpanther-max-1mb.gif" alt="fortnite dance" style=width:200px;height:200px;
+/>
+</head>
+
+<style>
+    body{
+        background-color:#ff4dff;
+    }
+</style>
+<body>
+<?php include 'login.php';
+	//connecting to database
+	try
+	{
+		$dsn = "mysql:host=courses;dbname=z1830506";
+		$pdo = new PDO($dsn, $username, $password);
+	}
+	catch(PDOexception $e)
+	{
+		Echo "connection to database failed: " . $e->getMessage();
+	}
+
+if(isset($_POST['delete_TS'])){
+    $pdo->exec("UPDATE Karaoke_TS SET QueueID = '3' WHERE The_time = ".$_POST['delete_TS']);
+}
+
+?>
+
+<!--Free queue-->
+<form method="post">
+<?php
+    echo "<h2><font face="Comic sans MS" size="5" color="#804000"> FREE SINGERS </font></h2>"
+$sql="SELECT Karaoke_TS.SingerName, Karaoke_TS.Price, Karaoke_TS.The_time, Song.Title
+FROM Karaoke_TS JOIN Song ON Karaoke_TS.SongID=Song.SongID 
+WHERE Karaoke_TS.QueueID=(SELECT QueueID FROM Queue WHERE Type = 'Free')
+ORDER BY Karaoke_TS.The_time"; 
+$result = $pdo->query($sql);
+	echo "<table border = '1' bordercolor="#ffff00">";
+	echo "<tr>";
+	echo "<td><font face="Comic sans MS">Select</font></td>";
+	echo "<td><font face="Comic sans MS">Name</font></td>";
+	echo "<td><font face="Comic sans MS">Title</font></td>";
+	echo "<td><font face="Comic sans MS">Time</font></td>";
+	echo "</tr>";
+while($row = $result->fetch()) {
+    echo "<tr>";
+    echo "<td><input type='radio' name='delete_TS'
+        value='".$row['The_time']."'></td>";
+    echo "<td>".$row['SingerName']."</td>";
+    echo "<td>".$row['Title']."</td>";
+    echo "<td>".$row['The_time']."</td>";
+    echo "</tr>";
+}
+echo "</table>";
+?>
+<input type="submit" value="Remove Singer from Queue">
+</form>
+
+<!--Paid queue-->
+<form method="post">
+<?php
+    echo "<h2><font face="Comic sans MS" size="5" color="#804000"> PAID SINGERS </font></h2>"
+$sql="SELECT Karaoke_TS.SingerName, Karaoke_TS.Price, Karaoke_TS.The_time, Song.Title 
+FROM Karaoke_TS JOIN Song ON Karaoke_TS.SongID=Song.SongID 
+WHERE Karaoke_TS.QueueID=(SELECT QueueID FROM Queue WHERE Type = 'Paid')
+ORDER BY Karaoke_TS.Price DESC";
+$result = $pdo->query($sql);
+        echo "<table border = '1' bordercolor="#ffff00">";
+        echo "<tr>";
+        echo "<td><font face="Comic sans MS">Select</font></td>";
+        echo "<td><font face="Comic sans MS">Name</font></td>";
+        echo "<td><font face="Comic sans MS">Title</font></td>";
+	echo "<td><font face="Comic sans MS">Payment</font></td>";
+        echo "<td><font face="Comic sans MS">Time</font></td>";
+        echo "</tr>";
+while($row = $result->fetch()) {
+    echo "<tr>";
+    echo "<td><input type='radio' name='delete_TS'
+        value='".$row['The_time']."'></td>";
+    echo "<td>".$row['SingerName']."</td>";
+    echo "<td>".$row['Title']."</td>";
+    echo "<td>".$row['Price']."</td>";
+    echo "<td>".$row['The_time']."</td>";
+    echo "</tr>";
+}
+echo "</table>";
+?>
+<input type="submit" value="Remove Singer from Queue">
+</form>
+</body>
+ 
+</html>
+
+

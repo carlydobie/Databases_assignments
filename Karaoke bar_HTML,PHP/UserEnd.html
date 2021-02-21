@@ -1,0 +1,141 @@
+    <html>
+<head>
+	<title> Karaoke Song Selection </title>
+	<h1><font face="Comic sans MS" size="20" color = "#00ff00"> Welcome to DJ Lehuta's Karaoke bar X3 </font></h1>
+</head>
+<body text="03FA02" link="#f0f0ff"
+     bgcolor="#2366FA">
+
+<img
+src="https://res.cloudinary.com/teepublic/image/private/s--MLZm22sc--/t_Preview/b_rgb:ffffff,c_lpad,f_jpg,h_630,q_90,w_1200/v1551526816/production/designs/4319849_0.jpg" style="width:300px;height:200px;"
+/>
+
+<img
+src="https://media.giphy.com/media/FuSsvKkZurNQY/giphy.gif" style="width:300px;height:200px;"
+/>
+
+</br>
+<?php include 'login.php';
+	//connecting to database
+	try
+	{
+		$dsn = "mysql:host=courses;dbname=z1830506";
+		$pdo = new PDO($dsn, $username, $password);
+	}
+	catch(PDOexception $e)
+	{
+		echo "connection to database failed: " . $e->getMessage();
+	}
+	if(isset($_POST["title"]))
+		$title = $_POST["title"];
+	if(isset($_POST["artist"]))
+		$artist = $_POST["artist"];
+	if(isset($_POST["cont"]))
+		$cont = $_POST["cont"];
+	if(isset($_POST["value"]))
+	{
+		if(isset($_POST["select"]))
+		{
+			if(isset($_POST["name"]))
+			{
+				$value = $_POST["value"];
+				$select = $_POST["select"];
+				$name = $_POST["name"];
+				//putting into queue
+				if($value > "0")
+					$type = "2";
+				else
+					$type = "1";
+
+				$pdo->exec("INSERT INTO Karaoke_TS (SingerName, Price, SongID, QueueID, The_time) VALUES ('".$name."', '".$value."', '".$select."', ".$type.", CURRENT_TIMESTAMP())");
+			}
+		}
+		else
+		{
+			echo"No song selected!";
+			echo"<br>";
+		}
+	}
+?>
+	<a href="http://students.cs.niu.edu/~z1826630/UserEnd.php"><font face="Comic Sans MS" size="6" color="white">RESET</font></a>
+	</br>
+	<!--form for title-->
+	<font face="Comic Sans MS" size="3">Search by title:</font>
+	<form method="post">
+		<input type="text" name="title">
+		<input type="submit" value="Search">
+	</form>
+	<!--form for artist-->
+	<font face="Comic Sans MS" size="3">Search by artist:</font>
+	<form method="post">
+		<input type="text" name="artist">
+		<input type="submit" value="Search">
+	</form>
+	<!--form for contributor-->
+	<font face="Comic Sans MS" size="3">Search by contributor:</font>
+	<form method="post">
+		<input type="text" name="cont">
+		<input type="submit" value="Search">
+	</form>
+	<!--paid and unpaid button-->
+	<form method="post">
+		<font face="Comic Sans MS" size="5">Payment:</font>
+		<input type="number" step=".01" name="value" value="0.00"style="height:25px;font-size:10pt;">
+            </br>
+	<!--singer name form-->
+	<form method="post">
+        <font face="Comic Sans MS" size="5">Name of Karaoke Singer:</font>
+		<input type="text" name="name" style="height:25px;font-size:10pt;">
+            </br>
+		<?php
+			//pulling specific table
+			if(isset($title))
+$sql = "SELECT SongInfo.SongID, Song.Title, Song.Year, SongInfo.Name
+        FROM SongInfo
+        JOIN Song ON SongInfo.SongID=Song.SongID
+	WHERE Song.SongID = (SELECT SongID FROM Song WHERE Title = '".$title."');
+	ORDERED BY Song.Title";
+			else if(isset($artist))
+$sql = "SELECT SongInfo.SongID, Song.Title, Song.Year, SongInfo.Name
+        FROM SongInfo
+        JOIN Song ON SongInfo.SongID=Song.SongID
+        WHERE SongInfo.SongID = (SELECT SongID FROM SongInfo WHERE Name = '".$artist."');
+	ORDERED BY Song.Title";
+			else if(isset($cont))
+$sql = "SELECT SongInfo.SongID, Song.Title, Song.Year, SongInfo.Name
+        FROM SongInfo
+        JOIN Song ON SongInfo.SongID=Song.SongID
+        WHERE SongInfo.ContributorID = (SELECT ContributorID FROM Contributor WHERE Name = '".$cont."');
+	ORDERED BY Song.Title";
+			else
+$sql = "SELECT SongInfo.SongID, Song.Title, Song.Year, SongInfo.Name
+	FROM SongInfo
+	JOIN Song ON SongInfo.SongID=Song.SongID;
+	ORDERED BY Song.Title";
+			//displaying table
+			$request = $pdo->query($sql);
+			echo "<table border='1'>";
+			echo "<thead>";
+			echo "<th><font face='Comic sans MS'>Select</font></th>";
+			echo "<th onclick=\"sortTable(0)\"><font face='Comic sans MS'>Title</font></th>";
+			echo "<th onclick=\"sortTablenum(1)\"><font face='Comic sans MS'>Year</font></th>";
+			echo "<th onclick=\"sortTable(2)\"><font face='Comic sans MS'>Name</font></th>";
+			echo "</thead>";
+			while($row = $request->fetch(PDO::FETCH_BOTH))
+			{
+				echo "<tr>";
+				echo "<td><input type='radio' name='select'
+				     value='".$row['SongID']."'></td>";
+				echo "<td>".$row['Title']."</td>";
+				echo "<td>".$row['Year']."</td>";
+				echo "<td>".$row['Name']."</td>";
+				echo "</tr>";
+			}
+		?>
+		<input type="submit" value="Let's sing!">
+	</form>
+</body>
+</html>
+
+    
+
